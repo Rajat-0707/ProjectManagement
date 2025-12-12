@@ -18,7 +18,7 @@ const Sidebar = () => {
   };
 
   const projectData = () => {
-    axios.get("${import.meta.env.VITE_API_URL}/projects/").then((res) => {
+    axios.get(`${import.meta.env.VITE_API_URL}/projects/`).then((res) => {
       setProjects(res.data);
     });
   };
