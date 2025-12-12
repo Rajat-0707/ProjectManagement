@@ -8,8 +8,10 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import axios from "axios";
 
+
 function App() {
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [authed, setAuthed] = useState(() => !!(typeof window !== 'undefined' && localStorage.getItem('token')));
 
   // Initialize axios Authorization from localStorage
   const stored = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -25,13 +27,30 @@ function App() {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           delete axios.defaults.headers.common.Authorization;
+          window.dispatchEvent(new Event('authChange'));
           window.location.href = '/login';
         }
         return Promise.reject(err);
       }
     );
-    return () => axios.interceptors.response.eject(id);
+    const onAuthChange = () => setAuthed(!!localStorage.getItem('token'));
+    window.addEventListener('authChange', onAuthChange);
+    window.addEventListener('storage', onAuthChange);
+    return () => {
+      axios.interceptors.response.eject(id);
+      window.removeEventListener('authChange', onAuthChange);
+      window.removeEventListener('storage', onAuthChange);
+    };
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    delete axios.defaults.headers.common.Authorization;
+    setAuthed(false);
+    window.dispatchEvent(new Event('authChange'));
+    window.location.href = '/login';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -63,7 +82,14 @@ function App() {
 
           {/* RIGHT - DESKTOP MENU */}
           <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600">
-          
+            {!authed ? (
+              <>
+                <Link to="/login" className="text-gray-700 hover:text-indigo-600">Login</Link>
+                <Link to="/signup" className="px-3 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-700">Sign up</Link>
+              </>
+            ) : (
+              <button onClick={handleLogout} className="px-3 py-1.5 rounded bg-gray-100 hover:bg-gray-200 text-gray-700">Logout</button>
+            )}
           </div>
         </div>
 
