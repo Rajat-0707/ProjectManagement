@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGODB_PATH)
 
 // --- App Setup ---
 const PORT = process.env.SERVER_PORT || 9000;
-const origin = process.env.CORS_ORIGIN || "http://localhost:5173";  // IMPORTANT for Vite
+const origin = process.env.CORS_ORIGIN || "http://localhost:5173";  
 
 const app = express();
 
