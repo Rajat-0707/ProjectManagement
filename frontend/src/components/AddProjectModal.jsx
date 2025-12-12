@@ -12,7 +12,7 @@ const AddProjectModal = ({ isModalOpen, closeModal, edit = false, id = null }) =
   useEffect(() => {
     if (edit && isModalOpen) {
       axios
-        .get(`http://localhost:9000/project/${id}`)
+        .get(`${import.meta.env.VITE_API_URL}/project/${id}`)
         .then((res) => {
           setTitle(res.data[0].title);
           setDesc(res.data[0].description);
@@ -27,8 +27,8 @@ const AddProjectModal = ({ isModalOpen, closeModal, edit = false, id = null }) =
     const payload = { title, description: desc };
 
     const apiCall = !edit
-      ? axios.post("http://localhost:9000/project/", payload)
-      : axios.put(`http://localhost:9000/project/${id}`, payload);
+      ? axios.post("${import.meta.env.VITE_API_URL}/project/", payload)
+      : axios.put(`${import.meta.env.VITE_API_URL}/project/${id}`, payload);
 
     apiCall
       .then((res) => {
