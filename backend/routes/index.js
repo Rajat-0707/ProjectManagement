@@ -25,7 +25,38 @@ api.get("/projects", async (req, res) => {
 // --------------------------------------------------
 // --------------------------------------------------
 // GET PROJECT BY ID
+
 // --------------------------------------------------
+api.get("/project/:projectId/task/:taskId", async (req, res) => {
+  const { projectId, taskId } = req.params;
+
+  if (!isValid(projectId) || !isValid(taskId)) {
+    return res.status(400).json({ error: true, message: "Invalid ID" });
+  }
+
+  try {
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ error: true, message: "Project not found" });
+    }
+
+    const task = project.task.id(taskId); // Mongoose subdocument lookup
+    if (!task) {
+      return res.status(404).json({ error: true, message: "Task not found" });
+    }
+
+    // Return same "old" formatting style (array)
+    return res.json([
+      {
+        task: [task]  // keep your old nested format
+      }
+    ]);
+  } catch (err) {
+    return res.status(500).json({ error: true, message: err.message });
+  }
+});
+
+
 api.get("/project/:id", async (req, res) => {
   const { id } = req.params;
 
