@@ -3,6 +3,8 @@ import api from './routes/index.js';
 import dotenv from 'dotenv';
 import mongoose from "mongoose";
 import cors from "cors";
+import auth from './routes/auth.js';
+
 
 mongoose.set('strictQuery', false);
 
@@ -28,6 +30,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // --- Routes ---
+app.use('/auth', auth);
+
 app.use(api);
 
 // --- Start Server ---
