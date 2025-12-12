@@ -109,7 +109,8 @@ const AddTaskModal = ({
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter task title"
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition"
-                  />
+                  required
+                    />
                 </div>
 
                 <div>
@@ -122,7 +123,8 @@ const AddTaskModal = ({
                     onChange={(e) => setDesc(e.target.value)}
                     placeholder="Describe your task..."
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition"
-                  ></textarea>
+                  required
+                    ></textarea>
                 </div>
 
                 {/* Footer Buttons */}
