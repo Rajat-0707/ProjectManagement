@@ -27,7 +27,7 @@ const AddProjectModal = ({ isModalOpen, closeModal, edit = false, id = null }) =
     const payload = { title, description: desc };
 
     const apiCall = !edit
-      ? axios.post("${import.meta.env.VITE_API_URL}/project/", payload)
+      ? axios.post(`${import.meta.env.VITE_API_URL}/project/`, payload)
       : axios.put(`${import.meta.env.VITE_API_URL}/project/${id}`, payload);
 
     apiCall
