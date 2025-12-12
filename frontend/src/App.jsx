@@ -3,6 +3,7 @@ import AppLayout from "./components/AppLayout";
 import Task from "./components/Task";
 import { Toaster } from "react-hot-toast";
 import { useState } from "react";
+import welcome from "./public/welcome.svg";
 
 function App() {
   const [mobileMenu, setMobileMenu] = useState(false);
@@ -57,7 +58,7 @@ function App() {
             element={
               <div className="flex flex-col items-center w-full pt-10 px-4">
                 <img
-                  src="/welcome.svg"
+                  src={welcome}
                   className="w-8/12 sm:w-6/12 md:w-4/12"
                   alt="welcome"
                 />
