@@ -9,7 +9,7 @@ const ProjectDropdown = ({ id, navigate }) => {
 
   const handleDelete = async () => {
     try {
-      const data = await axios.delete(`http://localhost:9000/project/${id}`);
+      const data = await axios.delete(`${import.meta.env.VITE_API_URL}/project/${id}`);
       if (data.data.deletedCount > 0) {
         toast.success("Project deleted successfully");
         navigate("/");
