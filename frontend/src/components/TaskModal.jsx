@@ -13,7 +13,7 @@ const TaskModal = ({ isOpen, setIsOpen, id }) => {
     if (!isOpen || !id?.projectId || !id?.id) return;
 
     axios
-      .get(`http://localhost:9000/project/${id.projectId}/task/${id.id}`)
+      .get(`${import.meta.env.VITE_API_URL}/project/${id.projectId}/task/${id.id}`)
       .then((res) => {
         setTaskData(res.data); // ✔ FIXED
       })
