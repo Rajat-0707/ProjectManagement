@@ -26,3 +26,5 @@ yarn-error.log*
 # uploads
 files/avatars
 files/issues
+
+.env
