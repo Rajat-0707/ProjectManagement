@@ -7,6 +7,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import axios from "axios";
+import welcome from "/public/welcome.svg";
+
 
 
 function App() {
@@ -111,7 +113,7 @@ function App() {
             element={
               <div className="flex flex-col items-center w-full pt-10 px-4">
                 <img
-                  src="./image/welcome.svg"
+                  src={welcome}
                   className="w-8/12 sm:w-6/12 md:w-4/12"
                   alt="welcome"
                 />
