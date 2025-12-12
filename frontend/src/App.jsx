@@ -3,7 +3,7 @@ import AppLayout from "./components/AppLayout";
 import Task from "./components/Task";
 import { Toaster } from "react-hot-toast";
 import { useState } from "react";
-import welcome from "./public/welcome.svg";
+import welcome from "/public/welcome.svg";
 
 function App() {
   const [mobileMenu, setMobileMenu] = useState(false);
