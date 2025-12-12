@@ -13,11 +13,12 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:9000/auth/login", { email, password });
+      const res = await axios.post("${import.meta.env.VITE_API_URL}/auth/login", { email, password });
       const { token, user } = res.data;
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+      window.dispatchEvent(new Event('authChange'));
       toast.success("Logged in");
       navigate("/");
     } catch (err) {
