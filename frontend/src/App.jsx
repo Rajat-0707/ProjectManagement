@@ -2,11 +2,36 @@ import { Routes, Route, Link } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import Task from "./components/Task";
 import { Toaster } from "react-hot-toast";
-import { useState } from "react";
-import welcome from "/public/welcome.svg";
+import { useEffect, useState } from "react";
+import PrivateRoute from "./components/PrivateRoute";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
+import axios from "axios";
 
 function App() {
   const [mobileMenu, setMobileMenu] = useState(false);
+
+  // Initialize axios Authorization from localStorage
+  const stored = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (stored && !axios.defaults.headers.common.Authorization) {
+    axios.defaults.headers.common.Authorization = `Bearer ${stored}`;
+  }
+
+  useEffect(() => {
+    const id = axios.interceptors.response.use(
+      (r) => r,
+      (err) => {
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          delete axios.defaults.headers.common.Authorization;
+          window.location.href = '/login';
+        }
+        return Promise.reject(err);
+      }
+    );
+    return () => axios.interceptors.response.eject(id);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,14 +76,16 @@ function App() {
         <Toaster position="top-right" gutter={8} />
 
         <Routes>
-          <Route path="/:projectId" element={<Task />} />
+          <Route path="/:projectId" element={<PrivateRoute><Task /></PrivateRoute>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
           <Route
             path="/"
             element={
               <div className="flex flex-col items-center w-full pt-10 px-4">
                 <img
-                  src={welcome}
+                  src="./image/welcome.svg"
                   className="w-8/12 sm:w-6/12 md:w-4/12"
                   alt="welcome"
                 />
