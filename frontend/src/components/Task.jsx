@@ -70,7 +70,7 @@ function Task() {
   useEffect(() => {
     if (!isAddTaskModalOpen || isRenderChange) {
       axios
-        .get(`http://localhost:9000/project/${projectId}`)
+        .get(`${import.meta.env.VITE_API_URL}/project/${projectId}`)
         .then((res) => {
           setTitle(res.data[0].title);
 
@@ -103,14 +103,14 @@ function Task() {
 
   const updateTodo = (data) => {
     axios
-      .put(`http://localhost:9000/project/${projectId}/todo`, data)
+      .put(`${import.meta.env.VITE_API_URL}/project/${projectId}/todo`, data)
       .catch(() => toast.error("Something went wrong"));
   };
 
   const handleDelete = (e, taskId) => {
     e.stopPropagation();
     axios
-      .delete(`http://localhost:9000/project/${projectId}/task/${taskId}`)
+      .delete(`${import.meta.env.VITE_API_URL}/project/${projectId}/task/${taskId}`)
       .then(() => {
         toast.success("Task deleted");
         setRenderChange(true);
