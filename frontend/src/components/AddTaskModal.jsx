@@ -19,7 +19,7 @@ const AddTaskModal = ({
   useEffect(() => {
     if (edit && isAddTaskModalOpen) {
       axios
-        .get(`http://localhost:9000/project/${projectId}/task/${taskId}`)
+        .get(`${import.meta.env.VITE_API_URL}/project/${projectId}/task/${taskId}`)
         .then((res) => {
           setTitle(res.data[0].task[0].title);
           setDesc(res.data[0].task[0].description);
@@ -34,8 +34,8 @@ const AddTaskModal = ({
     const payload = { title, description: desc };
 
     const request = !edit
-      ? axios.post(`http://localhost:9000/project/${projectId}/task`, payload)
-      : axios.put(`http://localhost:9000/project/${projectId}/task/${taskId}`, payload);
+      ? axios.post(`${import.meta.env.VITE_API_URL}/project/${projectId}/task`, payload)
+      : axios.put(`${import.meta.env.VITE_API_URL}/project/${projectId}/task/${taskId}`, payload);
 
     request
       .then((res) => {
