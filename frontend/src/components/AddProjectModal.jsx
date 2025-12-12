@@ -21,33 +21,41 @@ const AddProjectModal = ({ isModalOpen, closeModal, edit = false, id = null }) =
     }
   }, [isModalOpen]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ const handleSubmit = (e) => {
+  e.preventDefault();
 
-    const payload = { title, description: desc };
+  // client-side required validation
+  if (desc.trim() === "" || title.trim() === "") {
+    toast.error("Title and description are required");
+    return;
+  }
 
-    const apiCall = !edit
-      ? axios.post(`${import.meta.env.VITE_API_URL}/project/`, payload)
-      : axios.put(`${import.meta.env.VITE_API_URL}/project/${id}`, payload);
+  const payload = { title, description: desc };
 
-    apiCall
-      .then((res) => {
-        closeModal();
-        document.dispatchEvent(new CustomEvent("projectUpdate", { detail: res.data }));
-        toast.success(
-          edit ? "Project updated successfully" : "Project created successfully"
-        );
-        setTitle("");
-        setDesc("");
-      })
-      .catch((error) => {
-        if (error.response?.status === 422) {
-          toast.error(error.response.data.details[0].message);
-        } else {
-          toast.error("Something went wrong");
-        }
-      });
-  };
+  const apiCall = !edit
+    ? axios.post(`${import.meta.env.VITE_API_URL}/project/`, payload)
+    : axios.put(`${import.meta.env.VITE_API_URL}/project/${id}`, payload);
+
+  apiCall
+    .then((res) => {
+      closeModal();
+      document.dispatchEvent(
+        new CustomEvent("projectUpdate", { detail: res.data })
+      );
+      toast.success(
+        edit ? "Project updated successfully" : "Project created successfully"
+      );
+      setTitle("");
+      setDesc("");
+    })
+    .catch((error) => {
+      if (error.response?.status === 422) {
+        toast.error(error.response.data.details[0].message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    });
+};
 
   return (
     <Transition appear show={isModalOpen} as={Fragment}>
