@@ -2,6 +2,7 @@ import express from "express";
 import joi from "joi";
 import mongoose from "mongoose";
 import Project from "../models/index.js";
+import auth from "../middleware/auth.js";
 
 const api = express.Router();
 
@@ -11,7 +12,7 @@ const isValid = id => mongoose.isValidObjectId(id);
 // --------------------------------------------------
 // GET ALL PROJECTS
 // --------------------------------------------------
-api.get("/projects", async (req, res) => {
+api.get("/projects", auth, async (req, res) => {
   try {
     const projects = await Project.find({}, { task: 0, __v: 0, updatedAt: 0 });
     return res.json(projects);
@@ -25,39 +26,8 @@ api.get("/projects", async (req, res) => {
 // --------------------------------------------------
 // --------------------------------------------------
 // GET PROJECT BY ID
-
 // --------------------------------------------------
-api.get("/project/:projectId/task/:taskId", async (req, res) => {
-  const { projectId, taskId } = req.params;
-
-  if (!isValid(projectId) || !isValid(taskId)) {
-    return res.status(400).json({ error: true, message: "Invalid ID" });
-  }
-
-  try {
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ error: true, message: "Project not found" });
-    }
-
-    const task = project.task.id(taskId); // Mongoose subdocument lookup
-    if (!task) {
-      return res.status(404).json({ error: true, message: "Task not found" });
-    }
-
-    // Return same "old" formatting style (array)
-    return res.json([
-      {
-        task: [task]  // keep your old nested format
-      }
-    ]);
-  } catch (err) {
-    return res.status(500).json({ error: true, message: err.message });
-  }
-});
-
-
-api.get("/project/:id", async (req, res) => {
+api.get("/project/:id", auth, async (req, res) => {
   const { id } = req.params;
 
   if (!isValid(id))
@@ -76,7 +46,7 @@ api.get("/project/:id", async (req, res) => {
 // --------------------------------------------------
 // CREATE PROJECT
 // --------------------------------------------------
-api.post("/project", async (req, res) => {
+api.post("/project", auth, async (req, res) => {
   const schema = joi.object({
     title: joi.string().min(3).max(30).required(),
     description: joi.string().required(),
@@ -99,7 +69,7 @@ api.post("/project", async (req, res) => {
 // --------------------------------------------------
 // UPDATE PROJECT
 // --------------------------------------------------
-api.put("/project/:id", async (req, res) => {
+api.put("/project/:id", auth, async (req, res) => {
   const { id } = req.params;
 
   if (!isValid(id))
@@ -124,7 +94,7 @@ api.put("/project/:id", async (req, res) => {
 // --------------------------------------------------
 // DELETE PROJECT
 // --------------------------------------------------
-api.delete("/project/:id", async (req, res) => {
+api.delete("/project/:id", auth, async (req, res) => {
   const { id } = req.params;
 
   if (!isValid(id))
@@ -141,7 +111,7 @@ api.delete("/project/:id", async (req, res) => {
 // --------------------------------------------------
 // CREATE TASK
 // --------------------------------------------------
-api.post("/project/:id/task", async (req, res) => {
+api.post("/project/:id/task", auth, async (req, res) => {
   const { id } = req.params;
 
   if (!isValid(id))
@@ -175,7 +145,7 @@ api.post("/project/:id/task", async (req, res) => {
 // --------------------------------------------------
 // GET SINGLE TASK
 // --------------------------------------------------
-api.get("/project/:id/task/:taskId", async (req, res) => {
+api.get("/project/:id/task/:taskId", auth, async (req, res) => {
   const { id, taskId } = req.params;
 
   if (!isValid(id) || !isValid(taskId))
@@ -198,7 +168,7 @@ api.get("/project/:id/task/:taskId", async (req, res) => {
 // --------------------------------------------------
 // UPDATE TASK
 // --------------------------------------------------
-api.put("/project/:id/task/:taskId", async (req, res) => {
+api.put("/project/:id/task/:taskId", auth, async (req, res) => {
   const { id, taskId } = req.params;
 
   if (!isValid(id) || !isValid(taskId))
@@ -227,7 +197,7 @@ api.put("/project/:id/task/:taskId", async (req, res) => {
 // --------------------------------------------------
 // DELETE TASK
 // --------------------------------------------------
-api.delete("/project/:id/task/:taskId", async (req, res) => {
+api.delete("/project/:id/task/:taskId", auth, async (req, res) => {
   const { id, taskId } = req.params;
 
   if (!isValid(id) || !isValid(taskId))
@@ -247,7 +217,7 @@ api.delete("/project/:id/task/:taskId", async (req, res) => {
 // --------------------------------------------------
 // UPDATE ALL TASK STATUSES (drag + drop logic)
 // --------------------------------------------------
-api.put("/project/:id/todo", async (req, res) => {
+api.put("/project/:id/todo", auth, async (req, res) => {
   const { id } = req.params;
 
   if (!isValid(id)) return res.status(400).json({ error: true, message: "Invalid project ID" });
