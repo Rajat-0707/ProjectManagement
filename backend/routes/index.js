@@ -14,16 +14,16 @@ const isValid = id => mongoose.isValidObjectId(id);
 // --------------------------------------------------
 api.get("/projects", auth, async (req, res) => {
   try {
-    const projects = await Project.find({}, { task: 0, __v: 0, updatedAt: 0 });
+    const projects = await Project.find(
+      { owner: req.user.id },
+      { task: 0, __v: 0, updatedAt: 0 }
+    );
     return res.json(projects);
   } catch (err) {
     return res.status(500).json({ error: true, message: err.message });
   }
 });
 
-// --------------------------------------------------
-// GET PROJECT BY ID
-// --------------------------------------------------
 // --------------------------------------------------
 // GET PROJECT BY ID
 // --------------------------------------------------
@@ -34,10 +34,10 @@ api.get("/project/:id", auth, async (req, res) => {
     return res.status(400).json({ error: true, message: "Invalid project ID" });
 
   try {
-    const project = await Project.findById(id);
+    const project = await Project.findOne({ _id: id, owner: req.user.id });
     if (!project) return res.status(404).json({ error: true, message: "Project not found" });
 
-    return res.json([project]);  // IMPORTANT: keep old format
+    return res.json([project]); // keep old format
   } catch (err) {
     return res.status(500).json({ error: true, message: err.message });
   }
@@ -56,7 +56,10 @@ api.post("/project", auth, async (req, res) => {
   if (error) return res.status(422).json({ error: true, message: error.details[0].message });
 
   try {
-    const project = await Project.create(value);
+    const project = await Project.create({
+      ...value,
+      owner: req.user.id,
+    });
     return res.json(project);
   } catch (e) {
     if (e.code === 11000) {
@@ -84,7 +87,13 @@ api.put("/project/:id", auth, async (req, res) => {
   if (error) return res.status(422).json({ error: true, message: error.details[0].message });
 
   try {
-    const updated = await Project.findByIdAndUpdate(id, value, { new: true });
+    const updated = await Project.findOneAndUpdate(
+      { _id: id, owner: req.user.id },
+      value,
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: true, message: "Project not found" });
+
     return res.json(updated);
   } catch (err) {
     return res.status(500).json({ error: true, message: err.message });
@@ -101,7 +110,9 @@ api.delete("/project/:id", auth, async (req, res) => {
     return res.status(400).json({ error: true, message: "Invalid project ID" });
 
   try {
-    await Project.findByIdAndDelete(id);
+    const deleted = await Project.findOneAndDelete({ _id: id, owner: req.user.id });
+    if (!deleted) return res.status(404).json({ error: true, message: "Project not found" });
+
     return res.json({ message: "Project deleted" });
   } catch (err) {
     return res.status(500).json({ error: true, message: err.message });
@@ -126,13 +137,17 @@ api.post("/project/:id/task", auth, async (req, res) => {
   if (error) return res.status(422).json({ error: true, message: error.details[0].message });
 
   try {
-    const project = await Project.findById(id, { task: 1 });
+    const project = await Project.findOne(
+      { _id: id, owner: req.user.id },
+      { task: 1 }
+    );
+    if (!project) return res.status(404).json({ error: true, message: "Project not found" });
 
     const nextOrder = project.task.length;
     const nextIndex = project.task.length > 0 ? Math.max(...project.task.map(t => t.index)) + 1 : 0;
 
     await Project.updateOne(
-      { _id: id },
+      { _id: id, owner: req.user.id },
       { $push: { task: { ...value, stage: "Requested", order: nextOrder, index: nextIndex } } }
     );
 
@@ -153,7 +168,7 @@ api.get("/project/:id/task/:taskId", auth, async (req, res) => {
 
   try {
     const project = await Project.findOne(
-      { _id: id, "task._id": taskId },
+      { _id: id, owner: req.user.id, "task._id": taskId },
       { task: { $elemMatch: { _id: taskId } } }
     );
 
@@ -184,7 +199,7 @@ api.put("/project/:id/task/:taskId", auth, async (req, res) => {
 
   try {
     await Project.updateOne(
-      { _id: id, "task._id": taskId },
+      { _id: id, owner: req.user.id, "task._id": taskId },
       { $set: { "task.$.title": value.title, "task.$.description": value.description } }
     );
 
@@ -205,7 +220,7 @@ api.delete("/project/:id/task/:taskId", auth, async (req, res) => {
 
   try {
     await Project.updateOne(
-      { _id: id },
+      { _id: id, owner: req.user.id },
       { $pull: { task: { _id: taskId } } }
     );
     return res.json({ message: "Task deleted" });
@@ -240,7 +255,7 @@ api.put("/project/:id/todo", auth, async (req, res) => {
     await Promise.all(
       updates.map(update => {
         return Project.updateOne(
-          { _id: id, "task._id": update.taskId },
+          { _id: id, owner: req.user.id, "task._id": update.taskId },
           { $set: { "task.$.order": update.order, "task.$.stage": update.stage } }
         );
       })
