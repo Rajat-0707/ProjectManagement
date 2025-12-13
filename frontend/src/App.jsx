@@ -83,7 +83,7 @@ function App() {
           </button> */}
 
           {/* RIGHT - DESKTOP MENU */}
-          <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600">
+          <div className="md:flex items-center space-x-6 text-sm font-medium text-gray-600">
             {!authed ? (
               <>
                 <Link to="/login" className="text-gray-700 hover:text-indigo-600">Login</Link>
